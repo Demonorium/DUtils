@@ -170,9 +170,6 @@
     <ClInclude Include="include\_aDecl\Ddef.h" />
     <ClInclude Include="include\utils\SimpleTree.h" />
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="include\NoCode.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
