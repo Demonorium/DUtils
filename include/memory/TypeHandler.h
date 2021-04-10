@@ -30,12 +30,11 @@ namespace demonorium
 		}
 
 
-		//Пытается разрушить объект вызвав его деструктор(если он есть)
 		template<class T>
 		void utilize(void* object) {
 			_destr<T>::destr((T*)object);
 		}
-		//Пытается разрушить объект вызвав его деструктор(если он есть)
+		
 		template<class T>
 		void utilize(T& object) {
 			_destr<T>::destr(&object);
@@ -44,7 +43,7 @@ namespace demonorium
 #ifndef DEMONORIUM_UNSAFE
 		namespace
 		{
-			//Крайне не безопасно, не использовать для сложных объектов
+			//UNSAFE!
 			template<class T, class ... ARGS>
 			void construct(T& object, ARGS&& ... args) {
 				::new (&object) T(std::forward<ARGS>(args)...);
@@ -52,7 +51,7 @@ namespace demonorium
 		}
 		
 #elif DEMONORIUM_UNSAFE
-		//Крайне не безопасно, не использовать для сложных объектов
+		//UNSAFE but hidden
 		template<class T, class ... ARGS>
 		void construct(T& object, ARGS&& ... args) {
 			::new (&object) T(std::forward<ARGS>(args)...);
@@ -60,7 +59,7 @@ namespace demonorium
 #endif
 		namespace
 		{
-			//Возвращает максимальный размер типа
+			//Max size of type
 			template<class ... ARGS>
 			constexpr size_t typesSize = sizeof(selectByCondition<conditions::haveMaxSize, undeclared_type, ARGS...>);
 		}
@@ -93,14 +92,13 @@ namespace demonorium
 
 		template<class T, class ... TYPES>
 		class TypeHandler {
-			//Класс указывающий тип хранимых данных
 			template<class _T>
 			class _TypePointer {
 			public:
 				constexpr _TypePointer() noexcept = default;
 			};
 		public:
-			//Класс указывающий тип хранимых данных
+			//Class used to specify type
 			template<class _T>
 			using TypePointer = const _TypePointer<_T>&;
 
@@ -115,32 +113,35 @@ namespace demonorium
 			constexpr TypeHandler(TypePointer<D> _p, ARGS&& ... args);
 			constexpr TypeHandler() noexcept;
 
-			//Безопасно извлекает данные заданного типа
+			//Safe get
 			template<class D>
 			constexpr D& get();
 
-			//Безопасно извлекает данные заданного типа
+			//Safe get (const)
 			template<class D>
 			constexpr const D& get() const;
 
-			//Безопасно устанавливает данные заданного типа
+			//Safe set
 			template<class D, class ... ARGS>
 			constexpr void set(TypePointer<D> _p, ARGS&&...);
 
+			//Safe set (move)
 			template<class D>
 			constexpr void set(D&& obj);
 
+			//Check type in container
 			template<class D>
 			constexpr bool isType() const noexcept;
 			
-
+			//Check if container may contain type D
 			template<class D>
 			constexpr bool contains() const noexcept;
 
+			//Free container
 			constexpr void remove();
 
-			template<class D, class ... ARGS>
-			constexpr bool sameType(const TypeHandler<D, ARGS...>& other) const noexcept;
+			//Check if other TypeHandler may contains same type
+			constexpr bool sameType(const TypeHandler<T, TYPES...>& other) const noexcept;
 
 		private:
 			template<class D>
@@ -231,8 +232,7 @@ namespace demonorium
 		}
 
 		template<class T, class ...TYPES>
-		template<class D, class ...ARGS>
-		inline constexpr bool TypeHandler<T, TYPES...>::sameType(const TypeHandler<D, ARGS...>& other) const noexcept {
+		inline constexpr bool TypeHandler<T, TYPES...>::sameType(const TypeHandler<T, TYPES...>& other) const noexcept {
 			return isType(other.m_type);
 		}
 
